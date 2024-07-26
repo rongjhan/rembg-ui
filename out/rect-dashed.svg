@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 110">
+    <rect 
+        width="110" 
+        height="110" 
+        stroke-dasharray="
+        20
+        10
+        10
+        10
+        10
+        10
+        10
+        10
+        20
+        0
+        "
+        fill="none"
+        stroke="#696868"
+        stroke-width="20"
+        stroke-linejoin="round"
+    />
+</svg>
