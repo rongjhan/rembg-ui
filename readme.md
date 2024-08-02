@@ -60,7 +60,7 @@ download button in the siderbar
 
 
 # Demo vedio
-coming soon
+coming soon now
 
 # Acknowledgments
 * [Rembg](https://github.com/danielgatis/rembg/tree/main)
