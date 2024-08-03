@@ -1,12 +1,22 @@
-# install
-you can download executable file built for win64 , or you can clone this repository , and prepareing environment , and execute \_\_main\_\_.py in the environment
+![bundle](https://github.com/rongjhan/rembg-ui/actions/workflows/bundle.yaml/badge.svg)
 
+
+
+
+https://github.com/user-attachments/assets/aac2193c-f6a1-41d6-8695-c9e5ba02b6a4
+
+
+
+# install
+you can download executable file built for win64 in actions artifact, or you can clone this repository , and prepareing environment , and execute \_\_main\_\_.py in the environment
 
     cd [project-folder]
     conda env create -f ./environment.yml
     conda activate rembgui
     python __main__.py
 
+if you download from action artifact, you should unblock first like below  
+<img src="https://github.com/user-attachments/assets/2fe7665d-dab4-4bda-a6a7-d45004ed6004" alt="unblock" width="300"/>
 
 
 # Choose Image
@@ -58,9 +68,6 @@ the object wil be added to cutout list in the sidebar , we can show and hide the
 and also we can download cutout by click
 download button in the siderbar 
 
-
-# Demo vedio
-coming soon
 
 # Acknowledgments
 * [Rembg](https://github.com/danielgatis/rembg/tree/main)
