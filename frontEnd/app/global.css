@@ -1,0 +1,71 @@
+
+:root{
+    --nav-height : 120px;
+    --tab-height : 30px;
+    --tab-color :hsl(215, 70%, 91%);
+    --tab-cotnent-color:rgb(240, 240, 240) ;
+    --tab-cotnent-color-lighten: white;
+    --tab-cotnent-color-darken:rgb(222, 222, 222) ;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body{
+    all:initial
+}
+
+
+
+@property --rotate {
+    syntax: "<angle>";
+    initial-value: 132deg;
+    inherits: false;
+}
+
+.isFetching{
+    isolation: isolate;
+    &::before {
+        --border-size:10px;
+        content: "";
+        width: calc(100% + var(--border-size));
+        height: 100%;
+        /* border-radius: 8px; */
+        background-image: linear-gradient(var(--rotate), #aee8f8, #5781fa 43%, #eeebf2);
+        position: absolute;
+        z-index: -1;
+        top: 0;
+        left:calc(-1 * var(--border-size)/2);
+        animation: spin 2.5s linear infinite;
+    }
+    
+    &::after {
+        position: absolute;
+        content: "";
+        top: 10px;
+        left: 0;
+        right: 0;
+        z-index: -1;
+        height: 100%;
+        width: 100%;
+        margin: 0 auto;
+        filter: blur(15px);
+        background-image: linear-gradient(var(--rotate), #aee8f8, #5781fa 43%, #eeebf2);
+        /* background-image: linear-gradient(var(--rotate), #5ddcff, #3c67e3 43%, #4e00c2); */
+        opacity: 1;
+        transition: opacity .5s;
+        animation: spin 2.5s linear infinite;
+    }
+}
+
+
+@keyframes spin {
+    0% {
+        --rotate: 0deg;
+    }
+
+    100% {
+        --rotate: 360deg;
+    }
+} 
