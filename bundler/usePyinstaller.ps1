@@ -19,6 +19,7 @@ pyinstaller -y --log-level=WARN `
     --hidden-import=segment_anything_hq `
     --hidden-import=matplotlib `
     --hidden-import=requests `
+    --hidden-import=config `
     --hidden-import=model.hf_sam_mat `
     --hidden-import=model.hq_sam_mat `
     --hidden-import=model.rembg_mat `
