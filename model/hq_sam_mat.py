@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import torch.types
 from segment_anything_hq import sam_model_registry, SamPredictor
 from PIL import Image
-from typing import Literal, Optional
+from typing import Literal, Optional,Union
 from .util.get_inputs import INPUT_POINTS, INPUT_BOXS, INPUT_LABELS
 from config import Config
 # girhub : https://github.com/SysCV/sam-hq
@@ -28,7 +28,6 @@ def sam_hq_predict(
         print("cuda is not available, will run in cpu")
         device = "cpu"
 
-    sam.to(device=device)
     sam.eval()
     predictor = SamPredictor(sam)
 

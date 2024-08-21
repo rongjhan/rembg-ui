@@ -3,6 +3,7 @@ from typing import Union, Optional
 from PIL import Image
 from .rembg_mat import rembg_base_predict
 # from .hf_sam_mat import sam_predict
+from .birefnet_mat import birefnet_predict
 from .hq_sam_mat import sam_hq_predict
 from .util.mask_process import MaskProcessor
 from .util.basic_tool import NPIMAGE, fix_image_orientation
@@ -19,6 +20,8 @@ class SAMModel(StrEnum):
 # class AlphaEstimateModel(StrEnum):
 #     CLOSED_FORM = "closed_form"
 
+class BiRefNetModel(StrEnum):
+    BiRefNet = "birefnet"
 
 class REMBGModel(StrEnum):
     ISNET = "isnet-general-use"
@@ -29,7 +32,7 @@ class REMBGModel(StrEnum):
     SILUETA = "silueta"
 
 
-Models = Union[SAMModel, REMBGModel]
+Models = Union[SAMModel, REMBGModel, BiRefNetModel]
 
 
 def get_model(name: str) -> Optional[Models]:
@@ -37,6 +40,8 @@ def get_model(name: str) -> Optional[Models]:
         return SAMModel(name)
     elif name in REMBGModel._value2member_map_:
         return REMBGModel(name)
+    elif name in BiRefNetModel._value2member_map_:
+        return BiRefNetModel(name)
     else:
         return None
 
@@ -57,6 +62,8 @@ def init_mask(
     elif model in REMBGModel:
         model_name = str(model)
         mask = rembg_base_predict(img, model=model_name, *model_args, **model_kwargs)
+    elif model in BiRefNetModel:
+        mask = birefnet_predict(img, *model_args, **model_kwargs)
     else:
         raise ValueError("model not found")
 

@@ -25,6 +25,7 @@ c_sources = cythonize([
     Extension(f"{output_dir}.hf_sam_mat", [f"{source_dir}/hf_sam_mat.py"]),
     Extension(f"{output_dir}.hq_sam_mat", [f"{source_dir}/hq_sam_mat.py"]),
     Extension(f"{output_dir}.rembg_mat", [f"{source_dir}/rembg_mat.py"]),
+    Extension(f"{output_dir}.birefnet_mat", [f"{source_dir}/birefnet_mat.py"]),
     Extension(f"{output_dir}.__init__", [f"{source_dir}/__init__.py"]),
 ])
 

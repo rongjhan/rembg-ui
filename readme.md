@@ -55,7 +55,7 @@ object, but in these app we design it for only one target , it's intentional for
 
 # Edit Mask
 somtimes there are few defect in the mask
-, we can modify it by drawing write path to mark it as part of object
+, we can modify it by drawing white path to mark it as part of object
 ,and vice versa  
 and there is eraser tool to erase path
 
@@ -74,6 +74,7 @@ download button in the siderbar
 * [sam](https://github.com/facebookresearch/segment-anything) 
 * [sam-hq](https://github.com/SysCV/sam-hq/tree/main?tab=Apache-2.0-1-ov-file#readme)
 * [pymatting](https://github.com/pymatting/pymatting)
+* [birefnet](https://github.com/ZhengPeng7/BiRefNet)
   and many other tools usage by this project
 
 # Lisense

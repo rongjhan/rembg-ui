@@ -7,9 +7,9 @@ from typing import Literal, Union, Optional
 from config import Config
 from .util.get_inputs import INPUT_POINTS, INPUT_BOXS, INPUT_LABELS
 
-model_path = str(Config.cache_dir/"huggingface"/"hub")
+model_path = str(Config.cache_dir/"huggingface")
 os.environ['HF_HOME'] = model_path
-os.environ['TRANSFORMERS_CACHE'] = model_path  # cache路徑必須在import transformers前設置
+# cache路徑必須在import transformers前設置
 
 
 from transformers import SamModel, SamProcessor, SamImageProcessor
@@ -73,6 +73,8 @@ def sam_predict(
     # }
     with torch.no_grad():
         inputs: BatchFeature = processor(
+            # processor可以接收多張圖片進行inference , 但sam_predict設計為僅接收一張圖片
+            # 故將 raw_image和input_points 放進陣列裡
             [raw_image], 
             input_points=[input_points] if input_points else None,
             input_boxes=[input_boxes] if input_boxes else None, 
@@ -80,8 +82,7 @@ def sam_predict(
             return_tensors="pt"
         ).to(device)
         
-        # processor可以接收多張圖片進行inference , 但sam_predict設計為僅接收一張圖片
-        # 故將 raw_image和input_points 放進陣列裡
+
         image_embeddings = model.get_image_embeddings(inputs["pixel_values"].to(precision))
         inputs.pop("pixel_values", None)
         inputs.update({"image_embeddings": image_embeddings})

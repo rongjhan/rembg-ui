@@ -1,4 +1,6 @@
-# ensure pyinstaller, cython and c compiler was installed before
+# ensure c compiler was installed before
+pip install pyinstaller==6.9.0
+pip install cython==3.0.10
 . ./bundler/out_dir.ps1
 $out_dir = Get_outdir
 ren model model_source
@@ -23,6 +25,7 @@ pyinstaller -y --log-level=WARN `
     --hidden-import=model.hf_sam_mat `
     --hidden-import=model.hq_sam_mat `
     --hidden-import=model.rembg_mat `
+    --hidden-import=model.birefnet_mat `
     --hidden-import=model.util.basic_tool `
     --hidden-import=model.util.get_inputs `
     --hidden-import=model.util.mask_process `
