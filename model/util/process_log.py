@@ -3,7 +3,7 @@ from PIL import Image
 from PIL.ImageDraw import ImageDraw
 import numpy as np
 from typing import Literal,Optional
-from .get_inputs import INPUT_POINTS, INPUT_BOXS
+from .inputs_loader import INPUT_POINTS, INPUT_BOXS
 from .basic_tool import is_gray, figure_to_ndarray, NPIMAGE
 import math
 

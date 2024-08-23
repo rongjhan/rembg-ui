@@ -1,38 +1,44 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import torch.types
 from segment_anything_hq import sam_model_registry, SamPredictor
 from PIL import Image
-from typing import Literal, Optional,Union
-from .util.get_inputs import INPUT_POINTS, INPUT_BOXS, INPUT_LABELS
+from typing import Literal, Optional
+from .util.inputs_loader import INPUT_POINTS, INPUT_BOXS, INPUT_LABELS, Device, SamInputModifyer
 from config import Config
-# girhub : https://github.com/SysCV/sam-hq
+import torch
+# github : https://github.com/SysCV/sam-hq
 # Demo : https://github.com/SysCV/sam-hq/blob/main/demo/demo_hqsam_light.py
 
-model_path = Config.cache_dir/"sam_hq"
+cache_path = Config.cache_dir/"sam_hq"
+_ckpt_name = "sam_hq_vit_{}.pth"
 
 def sam_hq_predict(
     raw_image: Image.Image,
+    *,
     input_points: Optional[INPUT_POINTS] = None,
     input_labels: Optional[INPUT_LABELS] = None,
     input_boxes: Optional[INPUT_BOXS] = None,
     model_size: Literal["base", "large", "huge"] = "huge",
-    device: Literal["cpu", "cuda"] = "cpu",
+    device: Device = "cpu",
+    precision: torch.dtype = torch.float32,
 ) -> Image.Image:
     
-    model_name = f"vit_{model_size[0:1]}"
+    raw_image, device, precision, input_points, input_labels, input_boxes = (
+        SamInputModifyer(
+            raw_image,
+            device,
+            precision,
+            input_points,
+            input_labels,
+            input_boxes
+        ).get_inputs()
+    )
 
-    sam = sam_model_registry[model_name](checkpoint=model_path/f"sam_hq_{model_name}.pth")
-
-    if device=="cuda" and not torch.cuda.is_available():
-        print("cuda is not available, will run in cpu")
-        device = "cpu"
+    sam = sam_model_registry[f"vit_{model_size[0:1]}"](
+        checkpoint=cache_path / _ckpt_name.format(model_size[0:1])
+    )
 
     sam.eval()
     predictor = SamPredictor(sam)
-
-    if raw_image.mode != "RGB":
-        raw_image = raw_image.convert("RGB")
 
     predictor.set_image(np.array(raw_image))
 

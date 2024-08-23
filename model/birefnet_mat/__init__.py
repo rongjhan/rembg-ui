@@ -1,43 +1,24 @@
-# Imports
-
 from PIL import Image
 import torch
 from torchvision import transforms
-from config import Config
-import os
-from typing import Literal
-
-model_path = str(Config.cache_dir/"huggingface")
-os.environ['HF_HOME'] = model_path
-# cache路徑必須在import transformers前設置
-
+from ..util.inputs_loader import Device, InputModifyer
+from ..util.add_box_promt import add_box_prompt
 from .birefnet import BiRefNet
 
-
-
-
-
-
+@add_box_prompt
 def birefnet_predict(
     raw_image: Image.Image,
-    device: Literal["cpu", "cuda"] = "cuda",
+    device: Device = "cuda",
+    precision: torch.dtype = torch.float16,
 ) -> Image.Image:
+    
+    raw_image, device, precision = InputModifyer(raw_image, device, precision).get_inputs()
 
-    if raw_image.mode != "RGB":
-        raw_image = raw_image.convert("RGB")
-    
-    if device == "cuda":
-        if torch.cuda.is_available():
-            torch.set_float32_matmul_precision(['high', 'highest'][0])
-        else:
-            print("cuda is not available, will run in cpu")
-            device = "cpu"
-    
     birefnet_model = BiRefNet.from_pretrained('ZhengPeng7/BiRefNet')
-    birefnet_model.to(device)
+    birefnet_model.to(device, precision)
     birefnet_model.eval()
     with torch.no_grad():
-        preds = birefnet_model(transform_image(raw_image).to(device))[-1].sigmoid().cpu()
+        preds = birefnet_model(transform_image(raw_image).to(device, precision))[-1].sigmoid().cpu()
     
     pred = preds[0].squeeze()
     pred_pil = transforms.ToPILImage()(pred)

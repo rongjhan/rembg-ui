@@ -4,7 +4,7 @@ from .robust_segment_anything import SamPredictor, sam_model_registry
 from .robust_segment_anything.utils.transforms import ResizeLongestSide 
 from PIL import Image
 from typing import Literal, Optional
-from ..util.get_inputs import INPUT_POINTS, INPUT_BOXS, INPUT_LABELS
+from ..util.inputs_loader import INPUT_POINTS, INPUT_BOXS, INPUT_LABELS, Device, SamInputModifyer
 from config import Config
 import os
 import urllib.request as req
@@ -12,6 +12,8 @@ import urllib.request as req
 
 cache_path = Config.cache_dir/"sam_robust"
 ckpt_resource = "https://huggingface.co/robustsam/robustsam/resolve/main/model_checkpoint/"
+_ckpt_name = "robustsam_checkpoint_{}.pth"
+
 
 def sam_robust_predict(
     raw_image: Image.Image,
@@ -19,22 +21,21 @@ def sam_robust_predict(
     input_labels: Optional[INPUT_LABELS] = None,
     input_boxes: Optional[INPUT_BOXS] = None,
     model_size: Literal["base", "large", "huge"] = "large",
-    device: Literal["cpu", "cuda"] = "cpu",
+    device: Device = "cuda",
 ) -> Image.Image:
-    print("input_boxes : ", input_boxes)
-    if device=="cuda" and not torch.cuda.is_available():
-        print("cuda is not available, will run in cpu")
-        device = "cpu"
+    
+    raw_image, device, _, input_points, input_labels, input_boxes = (
+        SamInputModifyer(
+            raw_image,
+            device,
+            torch.float32,  # this model only work in float32
+            input_points,
+            input_labels,
+            input_boxes
+        ).get_inputs()
+    )
 
-    if input_points is not None:
-        if input_labels is None:
-            input_labels = [1] * len(input_points)
-        elif len(input_labels) != len(input_points):
-            raise ValueError("input_labels must have the same length as input_points")
-    elif input_boxes is None:
-            raise ValueError("input_points or input_boxes must be provided")
-
-    ckpt_name = f"robustsam_checkpoint_{model_size[0:1]}.pth"
+    ckpt_name = _ckpt_name.format(model_size[0:1])
     ckpt_cache = cache_path/ckpt_name
 
     if not os.path.exists(cache_path):
@@ -46,12 +47,9 @@ def sam_robust_predict(
     sam_transform = ResizeLongestSide(model.image_encoder.img_size)
     model = model.to(device)
 
-    if raw_image.mode != "RGB":
-        raw_image = raw_image.convert("RGB")
-
     data_dict = {}
 
-    #trasnform image
+    #transform image
     image = np.array(raw_image, dtype=np.uint8)
     image_t = torch.tensor(image, dtype=torch.uint8).unsqueeze(0).to(device)
     image_t = torch.permute(image_t, (0, 3, 1, 2))
@@ -87,7 +85,7 @@ def sam_robust_predict(
     output_mask = batched_output[0]['masks']
     h, w = output_mask.shape[-2:]
     # print(output_mask.shape, output_mask.dtype)
-    img = Image.fromarray(output_mask.reshape(h, w).numpy().astype(np.uint8)*255)
+    img = Image.fromarray(output_mask.reshape(h, w).cpu().numpy().astype(np.uint8)*255)
     # img.show()
     return img
 
