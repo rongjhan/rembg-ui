@@ -3,6 +3,7 @@ from typing import Union, Optional
 from PIL import Image
 from .rembg_mat import rembg_base_predict
 # from .hf_sam_mat import sam_predict
+from .robust_sam_mat import sam_robust_predict
 from .birefnet_mat import birefnet_predict
 from .hq_sam_mat import sam_hq_predict
 from .util.mask_process import MaskProcessor
@@ -56,7 +57,7 @@ def init_mask(
     mask: Image.Image
     if model in SAMModel:
         model_size = model.value.split("_")[1]
-        mask = sam_hq_predict(
+        mask = sam_robust_predict(
             img, model_size=model_size, *model_args, **model_kwargs
         )
     elif model in REMBGModel:
