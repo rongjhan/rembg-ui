@@ -2,7 +2,7 @@ from PIL import Image
 import torch
 from torchvision import transforms
 from ..util.inputs_loader import Device, InputModifyer
-from ..util.add_box_promt import add_box_prompt
+from ..util.add_box_prompt import add_box_prompt
 from .birefnet import BiRefNet
 
 @add_box_prompt

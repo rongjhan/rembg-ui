@@ -8,7 +8,7 @@ def add_box_prompt(predictor: Callable[..., Image.Image]) -> Callable[..., Image
     def wrapper(image: Image.Image, *args, box: Optional[BOX] = None, **kwargs):
         modifyer_args = {k: kwargs[k] for k in kwargs if k in ["device", "precision"]}
         image, device, precision = InputModifyer(image, **modifyer_args).get_inputs()
-        print("box:", box)
+
         kwargs["device"] = device
         kwargs["precision"] = precision
 
@@ -17,7 +17,11 @@ def add_box_prompt(predictor: Callable[..., Image.Image]) -> Callable[..., Image
 
         if need_crop:
             box = tuple([int(p) for p in box])
-            image = image.crop(box)
+            try:
+                image = image.crop(box)
+            except ValueError:
+                box = box[:2]+box[2:]
+                image = image.crop(box)
         
         mask = predictor(image, *args, **kwargs)
 

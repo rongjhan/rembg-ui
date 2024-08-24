@@ -77,13 +77,13 @@ class SamInputModifyer(InputModifyer):
         input_boxes: Optional[INPUT_BOXS] = None
     ):
         super().__init__(image, device, precision)
-        self.points, self.labels, self.boxes = self.check_modify_prompt(
+        self.points, self.labels, self.boxes = self.check_prompt(
             input_points,
             input_labels,
             input_boxes
         )
         
-    def check_modify_prompt(
+    def check_prompt(
             self,
             input_points: Optional[INPUT_POINTS] = None,
             input_labels: Optional[INPUT_LABELS] = None,

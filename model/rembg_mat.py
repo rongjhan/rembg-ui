@@ -3,7 +3,7 @@ from rembg.sessions.base import BaseSession
 from PIL.Image import Image
 from config import Config
 # from .util.inputs_loader import Device, InputModifyer
-from .util.add_box_promt import add_box_prompt
+from .util.add_box_prompt import add_box_prompt
 # from .util.process_wrapper import self_defined_post_process, self_defined_alpha_estimate
 # rembg範例:https://github.com/danielgatis/rembg/blob/main/USAGE.md
 

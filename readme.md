@@ -30,8 +30,7 @@ most model works with no other input
 just click run , then model can generate
 mask for obvious object in the image
 but it may not target the right object
-you want , in these situation we seggest
-use sam model instead.
+in this situation , every model can accept a box region as input to mark object you want 
 
 we can see both the generaed mask and original image in the window by default,
 but you also can show mask or orignal image only, by toggling the layer button you want to see
@@ -42,7 +41,7 @@ the new mask is generated or the original image was deleted from the list , so y
 # SAM Model Prompt
 sam is an segmentation model can accept prompt to target a certain object  
 sam model has ability to target multiple
-object, but in these app we design it for only one target , it's intentional for unify the operation betwenen models  
+object, but in these app we design it for only one target , it's intentional for unify the operation between models  
 
 **mark types :**  
 * include box
@@ -75,6 +74,7 @@ download button in the siderbar
 * [sam-hq](https://github.com/SysCV/sam-hq/tree/main?tab=Apache-2.0-1-ov-file#readme)
 * [pymatting](https://github.com/pymatting/pymatting)
 * [birefnet](https://github.com/ZhengPeng7/BiRefNet)
+* [robust-sam](https://github.com/robustsam/RobustSAM)
   and many other tools usage by this project
 
 # Lisense
