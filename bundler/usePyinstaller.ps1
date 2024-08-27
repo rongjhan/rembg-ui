@@ -1,6 +1,6 @@
 # ensure c compiler was installed before
-# conda install pyinstaller
-# pip install cython==3.0.10
+pip install pyinstaller
+pip install cython==3.0.10
 . ./bundler/out_dir.ps1
 $out_dir = Get_outdir
 ren model model_source
