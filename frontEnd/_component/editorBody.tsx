@@ -132,7 +132,7 @@ function InitStageBody(props: { rawImg: RawImage}) {
                 }
                 children.push(acceptMarkInput? 
                     <MarkInitLayer {...containSize} markStyle={markStyle} rawImg={props.rawImg}/>:
-                    <SimpleInitLayer rawImg={props.rawImg}/>
+                    <SimpleInitLayer {...containSize} rawImg={props.rawImg}/>
                 )
 
                 return children
@@ -143,10 +143,84 @@ function InitStageBody(props: { rawImg: RawImage}) {
 
 
 function SimpleInitLayer(props: {
+    width: number,
+    height: number,
     rawImg: RawImage
 }){
-    useInitMaskQuery({rawImage: props.rawImg})
-    return null
+    type Rect = { x: number, y: number, width: number, height: number }
+    let [rect, setRect] = React.useState<Rect | null>(null)
+    let mouseDownPoint = React.useRef<{ x: number, y: number } | null>(null)
+
+    useInitMaskQuery(({model,alphaEstimate})=>{
+        let {width:w,height:h} = props.rawImg
+        let args = {rawImage: props.rawImg}
+        if (rect){
+            let box = [rect.x*w, rect.y*h, (rect.x+rect.width)*w, (rect.y+rect.height)*h]
+            if (rect.width < 0 || rect.height < 0){
+                box = box.slice(2).concat(box.slice(0,2))
+            }
+            args["modelArgs"] = {"box":box}
+        }
+        return args
+    })
+
+    let handleMouseDown = (event:KonvaEventObject<MouseEvent>) => {
+        let { x, y } = event.target.getStage().getPointerPosition()
+        mouseDownPoint.current = { x: x / props.width, y: y / props.height }
+    }
+
+    let handleMouseUp = (event:KonvaEventObject<MouseEvent>) => {
+        mouseDownPoint.current = null
+    }
+
+    let handleMouseMove = (event:KonvaEventObject<MouseEvent>) => {
+        if (mouseDownPoint.current) {
+            let { x, y } = event.target.getStage().getPointerPosition()
+            x = Math.max(Math.min(x / props.width,1),0)
+            y = Math.max(Math.min(y / props.height,1),0)
+            let { x: sx, y: sy } = mouseDownPoint.current
+            setRect({ x: sx, y: sy, width: x - sx, height: y - sy })
+        }
+    }
+
+    let handleKeyPress = (e:KeyboardEvent) => {
+        let checkPressed  = (e:KeyboardEvent)=>{
+            switch (e.type){
+                case "keydown":
+                    return e.ctrlKey && e.key == "z"
+                case "keyup":
+                    return !(e.key == "z")
+                default:
+                    return false
+            }
+        }
+
+        if (checkPressed(e)) {setRect(null)}
+        return checkPressed
+    }
+
+    return (
+        <Layer
+            style={{"cursor":"crosshair"}}
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={(e)=>mouseDownPoint.current = null}
+            onKeyPress={handleKeyPress}
+        >
+            {rect ?
+                <Rect
+                    x={rect.x * props.width}
+                    y={rect.y * props.height}
+                    width={rect.width * props.width}
+                    height={rect.height * props.height}
+                    fill="transparent"
+                    stroke="white"
+                />
+                : null
+            }
+        </Layer>
+    )
 }
 
 function MarkInitLayer(props: {

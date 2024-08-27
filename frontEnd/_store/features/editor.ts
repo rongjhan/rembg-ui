@@ -2,7 +2,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createFormItem, createFormGroup,setFormItemValue } from "@/_lib/form_tool"
 import {ModelKeys} from "../type"
-
+import { Model } from '../enum'
 
 // editorRoot>>[imageid,showimage,showCutout] >> stage  >> init[model >> mark_style , alphaEstimate] 
 //                                                      >> modify[tool_type, tool_size]
@@ -91,7 +91,8 @@ let model = createFormItem(
     "select",
     {   
         value:"ISNET",
-        options:["ISNET","ISNET_ANIME","U2NET","U2NET_HUMAN_SEG","U2NET_CLOTH_SEG","SILUETA","SAM_BASE","SAM_LARGE","SAM_HUGE"]
+        options:Object.keys(Model)
+        // options:["ISNET","ISNET_ANIME","U2NET","U2NET_HUMAN_SEG","U2NET_CLOTH_SEG","SILUETA","SAM_BASE","SAM_LARGE","SAM_HUGE"]
     },
     (current)=>current.payload.value.includes("SAM")?samMarkStyle:null
 
@@ -101,7 +102,7 @@ let samMarkStyle = createFormItem(
     "markStyle",
     "select",
     {    
-        value:"include_points",
+        value:"include_box",
         options:["include_points","exclude_points","include_box"]
     }
 )

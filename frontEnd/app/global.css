@@ -33,6 +33,7 @@ body{
         height: 100%;
         /* border-radius: 8px; */
         background-image: linear-gradient(var(--rotate), #aee8f8, #5781fa 43%, #eeebf2);
+         /* #ff0000 ,#0400ff */
         position: absolute;
         z-index: -1;
         top: 0;

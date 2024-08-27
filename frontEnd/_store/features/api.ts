@@ -3,9 +3,11 @@
 import {skipToken, createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import {InitMaskParam} from "../type"
 
-
-// let baseQuery = fetchBaseQuery({ baseUrl:`http://localhost:5000`}) //test usage
-let baseQuery = fetchBaseQuery()
+const dev = process.env.NODE_ENV !== 'production';
+console.log("dev:",dev)
+let baseQuery = dev? fetchBaseQuery({ baseUrl:`http://localhost:5000`}):fetchBaseQuery() 
+//test usage
+// let baseQuery = fetchBaseQuery()
 
 // Define a service using a base URL and expected endpoints
 const processApi = createApi({

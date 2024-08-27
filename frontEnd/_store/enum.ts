@@ -7,7 +7,8 @@ export enum Model{
     SILUETA = "silueta",
     SAM_BASE = "sam_base",
     SAM_LARGE = "sam_large",
-    SAM_HUGE = "sam_huge"
+    SAM_HUGE = "sam_huge",
+    BIREFNET = "birefnet",
 }
 
 
