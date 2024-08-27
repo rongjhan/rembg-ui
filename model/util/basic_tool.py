@@ -46,18 +46,11 @@ def figure_to_ndarray(figure:plt.Figure)->NPIMAGE:
 
     return image
 
-
-def fix_image_orientation(img:Image.Image):
-    """參考 import rembg.bg.fix_image_orientation 實作"""
-    return ImageOps.exif_transpose(img)
-
-
 def show_image(img:NPIMAGE|Image.Image):
     if isinstance(img,Image.Image):
         img.show()
     else:
         Image.fromarray(img).show()
-
 
 def show_distinct_pixel(NPIMAGE:NPIMAGE):
     pixels = []

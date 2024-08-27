@@ -1,4 +1,4 @@
-# check nuitka was installed before execute
+pip install nuitka
 . ./bundler/out_dir.ps1
 $out_dir = Get_outdir
 nuitka --output-filename=rembgui `

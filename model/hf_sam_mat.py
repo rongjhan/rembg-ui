@@ -1,17 +1,9 @@
 import torch
 import numpy as np
-import os
 import torch.types
 from PIL import Image
-from typing import Literal, Union, Optional
-from config import Config
-from .util.get_inputs import INPUT_POINTS, INPUT_BOXS, INPUT_LABELS
-
-model_path = str(Config.cache_dir/"huggingface"/"hub")
-os.environ['HF_HOME'] = model_path
-os.environ['TRANSFORMERS_CACHE'] = model_path  # cache路徑必須在import transformers前設置
-
-
+from typing import Literal, Optional
+from .util.inputs_loader import INPUT_POINTS, INPUT_BOXS, INPUT_LABELS, Device, SamInputModifyer
 from transformers import SamModel, SamProcessor, SamImageProcessor
 from transformers.feature_extraction_utils import BatchFeature
 from transformers.models.sam.modeling_sam import SamImageSegmentationOutput
@@ -30,30 +22,21 @@ def sam_predict(
     input_labels: Optional[INPUT_LABELS] = None,
     input_boxes: Optional[INPUT_BOXS] = None,
     model_size: Literal["base", "large", "huge"] = "huge",
-    device: Literal["cpu", "cuda"] = "cpu",
-    precision: Union[torch.float16, torch.float32] = torch.float32,
+    device: Device = "cpu",
+    precision: torch.dtype = torch.float32,
 ) -> Image.Image:
-
-    if raw_image.mode != "RGB":
-        raw_image = raw_image.convert("RGB")
-
-    if device=="cuda" and not torch.cuda.is_available():
-        print("cuda is not available, will run in cpu")
-        device = "cpu"
-
-    if device == "cpu" and precision == torch.float16:
-        print("half is not supported on cpu, will run in float32 instead")
-        precision = torch.float32
-
-    if input_points:
-        if input_labels is None:
-            input_labels = [1] * len(input_points)
-        elif len(input_labels) != len(input_points):
-            raise ValueError("input_labels must have the same length as input_points")
-    elif input_boxes is None:
-            raise ValueError("input_points or input_boxes must be provided")
     
-    
+    raw_image, device, precision, input_points, input_labels, input_boxes = (
+        SamInputModifyer(
+            raw_image,
+            device,
+            precision,
+            input_points,
+            input_labels,
+            input_boxes
+        ).get_inputs()
+    )
+
     model_size = f"facebook/sam-vit-{model_size}"
     model: SamModel = SamModel.from_pretrained(model_size, torch_dtype=precision).to(device)
     # to方法定義於PreTrainedModel類中 , 定義於 transformer.modeling_utils``
@@ -73,6 +56,8 @@ def sam_predict(
     # }
     with torch.no_grad():
         inputs: BatchFeature = processor(
+            # processor可以接收多張圖片進行inference , 但sam_predict設計為僅接收一張圖片
+            # 故將 raw_image和input_points 放進陣列裡
             [raw_image], 
             input_points=[input_points] if input_points else None,
             input_boxes=[input_boxes] if input_boxes else None, 
@@ -80,8 +65,7 @@ def sam_predict(
             return_tensors="pt"
         ).to(device)
         
-        # processor可以接收多張圖片進行inference , 但sam_predict設計為僅接收一張圖片
-        # 故將 raw_image和input_points 放進陣列裡
+
         image_embeddings = model.get_image_embeddings(inputs["pixel_values"].to(precision))
         inputs.pop("pixel_values", None)
         inputs.update({"image_embeddings": image_embeddings})

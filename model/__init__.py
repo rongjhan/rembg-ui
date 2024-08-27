@@ -1,11 +1,20 @@
 from enum import StrEnum
 from typing import Union, Optional
 from PIL import Image
+from config import Config
+import os
+
+model_path = str(Config.cache_dir/"huggingface")
+os.environ['HF_HOME'] = model_path
+# cache路徑必須在import transformers前設置
+
 from .rembg_mat import rembg_base_predict
-# from .hf_sam_mat import sam_predict
+from .hf_sam_mat import sam_predict
+from .robust_sam_mat import sam_robust_predict
+from .birefnet_mat import birefnet_predict
 from .hq_sam_mat import sam_hq_predict
 from .util.mask_process import MaskProcessor
-from .util.basic_tool import NPIMAGE, fix_image_orientation
+from .util.basic_tool import NPIMAGE
 
 # print("u2net" in iter(REMBGModel))
 # print("u2net" in REMBGModel._value2member_map_)
@@ -19,6 +28,8 @@ class SAMModel(StrEnum):
 # class AlphaEstimateModel(StrEnum):
 #     CLOSED_FORM = "closed_form"
 
+class BiRefNetModel(StrEnum):
+    BiRefNet = "birefnet"
 
 class REMBGModel(StrEnum):
     ISNET = "isnet-general-use"
@@ -29,7 +40,7 @@ class REMBGModel(StrEnum):
     SILUETA = "silueta"
 
 
-Models = Union[SAMModel, REMBGModel]
+Models = Union[SAMModel, REMBGModel, BiRefNetModel]
 
 
 def get_model(name: str) -> Optional[Models]:
@@ -37,26 +48,27 @@ def get_model(name: str) -> Optional[Models]:
         return SAMModel(name)
     elif name in REMBGModel._value2member_map_:
         return REMBGModel(name)
+    elif name in BiRefNetModel._value2member_map_:
+        return BiRefNetModel(name)
     else:
         return None
 
 
 def init_mask(
-    img: Image.Image, model: Models, *model_args, **model_kwargs
+    img: Image.Image, model: Models, **model_kwargs
 ) -> Image.Image:
-    # preprocess
-    img = fix_image_orientation(img)
-    
     # prdeict
     mask: Image.Image
     if model in SAMModel:
         model_size = model.value.split("_")[1]
-        mask = sam_hq_predict(
-            img, model_size=model_size, *model_args, **model_kwargs
+        mask = sam_robust_predict(
+            img, model_size=model_size, **model_kwargs
         )
     elif model in REMBGModel:
         model_name = str(model)
-        mask = rembg_base_predict(img, model=model_name, *model_args, **model_kwargs)
+        mask = rembg_base_predict(img, model=model_name, **model_kwargs)
+    elif model in BiRefNetModel:
+        mask = birefnet_predict(img, **model_kwargs)
     else:
         raise ValueError("model not found")
 

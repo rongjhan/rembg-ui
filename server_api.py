@@ -4,6 +4,16 @@ from model import *
 # from model import init_mask, post_process_mask, get_model, Models
 import json
 from io import BytesIO
+import logging
+
+
+logging.basicConfig(
+    level=logging.ERROR,
+    format="%(asctime)s-%(levelname)s-%(message)s",
+    filename="server.log",
+    filemode="w"
+)
+
 bp_api = Blueprint("api", __name__, url_prefix="/api")
 
 
@@ -36,6 +46,7 @@ def get_init_mask():
             return send_file(img_to_bytes(mask,format="png"), mimetype="image/png")
 
         except Exception as e:
+            logging.exception("init_mask")
             print(e, model)
 
     return Response(status=404, response="invalid input")
